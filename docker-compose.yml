@@ -1,6 +1,10 @@
 version: '3.7'
 
-services: 
+volumes:
+  static:
+  elastic:
+
+services:
   php-fpm:
     build:
       context: .
@@ -11,6 +15,10 @@ services:
       - '39000:39000'
     volumes:
       - .:/app
+      - /app/vendor
+      - static:/static
+    depends_on:
+      - mariadb
 
   frontend:
     build:
@@ -19,7 +27,10 @@ services:
       target: frontend
     volumes:
       - .:/app
-    command: npx webpack --watch -p --color --progress
+      - /app/node_modules
+      - /app/templates/skin/synio/locale/ru_RU/LC_MESSAGES
+      - static:/app/static
+    command: npm run build-dev
 
   nginx:
     build:
@@ -29,10 +40,32 @@ services:
       - '8000:80'
     volumes:
       - .:/app
-    depends_on: 
+      - static:/app/static
+    depends_on:
       - php-fpm
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: docker/mariadb/Dockerfile
 
   redis:
     image: redis:alpine
-    ports:
-      - '6379:6379'
+
+  celery:
+    build:
+      context: .
+      dockerfile: docker/celery/Dockerfile
+    depends_on:
+      - redis
+    command: celery worker --pool=solo
+
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.3
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+    environment:
+      - cluster.name=tabun
+      - discovery.type=single-node
+      - path.repo=/usr/share/elasticsearch
+      - "ES_JAVA_OPTS=-Xms512m -Xmx2048m"

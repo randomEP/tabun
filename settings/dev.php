@@ -1,7 +1,7 @@
 <?php
 $config['path']['root']['web'] = 'http://' . $_SERVER['HTTP_HOST'];
 
-$config['db']['params']['host'] = '127.0.0.1';
+$config['db']['params']['host'] = 'mariadb';
 $config['db']['params']['port'] = '3306';
 $config['db']['params']['user'] = 'tabun';
 $config['db']['params']['pass'] = 'tabun';
@@ -15,9 +15,9 @@ $config['path']['uploads']['url'] = '//localhost:8000/storage';
 $config['path']['smarty']['compiled'] = '/tmp/smarty/compiled';
 $config['path']['smarty']['cache'] = '/tmp/smarty/cache';
 
-$config['sys']['elastic']['hosts'] = ["127.0.0.1:9200"];
+$config['sys']['elastic']['hosts'] = ["elastic:9200"];
 
-$config['sys']['celery']['host'] = '127.0.0.1';
+$config['sys']['celery']['host'] = 'redis';
 $config['sys']['celery']['port'] = 6379;
 $config['sys']['celery']['db'] = 1;
 
